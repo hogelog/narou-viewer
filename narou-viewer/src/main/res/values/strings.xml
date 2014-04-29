@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NarouViewer</string>
+
+    <string name="narou_url">http://syosetu.com/</string>
+    <string name="narou_domain">syosetu.com</string>
+    <string name="back_exit_confirm">もう一度押すと終了します</string>
+</resources>
