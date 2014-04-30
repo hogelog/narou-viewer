@@ -8,15 +8,16 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 import org.hogel.android.narouviewer.app.R;
+import roboguice.inject.InjectFragment;
+
+import javax.inject.Inject;
 
 public class NarouWebView extends WebView {
-    private final WebSettings settings;
-
     private int backKeyCount = 0;
 
     public NarouWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        settings = getSettings();
+        final WebSettings settings = getSettings();
         settings.setJavaScriptEnabled(true);
     }
 
@@ -28,7 +29,7 @@ public class NarouWebView extends WebView {
                 return true;
             } else if (backKeyCount == 0) {
                 ++backKeyCount;
-                Toast.makeText(getContext(), R.string.back_exit_confirm, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.message_back_exit_confirm, Toast.LENGTH_SHORT).show();
                 return true;
             }
         }
@@ -40,5 +41,13 @@ public class NarouWebView extends WebView {
     public boolean onTouchEvent(MotionEvent event) {
         backKeyCount = 0;
         return super.onTouchEvent(event);
+    }
+
+    public void goTop() {
+        loadUrl(getContext().getString(R.string.url_narou_top));
+    }
+
+    public void goUserHome() {
+        loadUrl(getContext().getString(R.string.url_narou_user_home));
     }
 }

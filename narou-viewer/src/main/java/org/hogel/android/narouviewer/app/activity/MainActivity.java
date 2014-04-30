@@ -2,7 +2,6 @@ package org.hogel.android.narouviewer.app.activity;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.webkit.WebView;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -14,7 +13,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         final Intent intent = new Intent(this, BrowserActivity.class);
-        intent.setData(Uri.parse(getString(R.string.narou_url)));
+        intent.setData(Uri.parse(getString(R.string.url_narou_top)));
         startActivityForResult(intent, 0);
     }
 

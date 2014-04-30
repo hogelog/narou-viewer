@@ -2,7 +2,13 @@
 <resources>
     <string name="app_name">NarouViewer</string>
 
-    <string name="narou_url">http://syosetu.com/</string>
     <string name="narou_domain">syosetu.com</string>
-    <string name="back_exit_confirm">もう一度押すと終了します</string>
+
+    <string name="url_narou_top">http://syosetu.com/</string>
+    <string name="url_narou_user_home">http://syosetu.com/user/top/</string>
+
+    <string name="message_back_exit_confirm">もう一度押すと終了します</string>
+
+    <string name="action_top">トップ</string>
+    <string name="action_user_home">ホーム</string>
 </resources>
