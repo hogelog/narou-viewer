@@ -50,4 +50,8 @@ public class NarouWebView extends WebView {
     public void goUserHome() {
         loadUrl(getContext().getString(R.string.url_narou_user_home));
     }
+
+    public void goRanking() {
+        loadUrl(getContext().getString(R.string.url_narou_ranking));
+    }
 }

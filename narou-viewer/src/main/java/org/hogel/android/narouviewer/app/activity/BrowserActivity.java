@@ -45,6 +45,9 @@ public class BrowserActivity extends RoboActivity {
             case R.id.action_user_home:
                 narouWebView.goUserHome();
                 return true;
+            case R.id.action_ranking:
+                narouWebView.goRanking();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
