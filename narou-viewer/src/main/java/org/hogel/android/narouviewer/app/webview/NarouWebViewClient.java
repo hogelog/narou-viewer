@@ -31,12 +31,12 @@ public class NarouWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
-        browserActivity.setProgressBarIndeterminateVisibility(true);
+        browserActivity.onPageStarted(view, url);
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        browserActivity.setProgressBarIndeterminateVisibility(false);
+        browserActivity.onPageFinished(view, url);
         super.onPageFinished(view, url);
     }
 }
