@@ -8,9 +8,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 import org.hogel.android.narouviewer.app.R;
-import roboguice.inject.InjectFragment;
-
-import javax.inject.Inject;
 
 public class NarouWebView extends WebView {
     private int backKeyCount = 0;
