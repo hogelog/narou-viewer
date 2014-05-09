@@ -24,6 +24,7 @@ public class NarouWebView extends WebView {
         super(context, attrs, defStyle);
         final WebSettings settings = getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
     }
 
     @Override
