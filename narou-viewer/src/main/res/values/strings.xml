@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NarouViewer</string>
+    <string name="app_name">なろうビューア</string>
+    <string name="app_action_bar_title">ろうビューア</string>
 
     <string name="narou_domain">syosetu.com</string>
 

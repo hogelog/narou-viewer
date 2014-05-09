@@ -1,5 +1,6 @@
 package org.hogel.android.narouviewer.app.activity;
 
+import android.app.ActionBar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;

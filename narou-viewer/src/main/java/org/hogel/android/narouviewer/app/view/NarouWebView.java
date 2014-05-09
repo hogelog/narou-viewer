@@ -12,8 +12,16 @@ import org.hogel.android.narouviewer.app.R;
 public class NarouWebView extends WebView {
     private int backKeyCount = 0;
 
+    public NarouWebView(Context context) {
+        this(context, null, R.style.AppTheme);
+    }
+
     public NarouWebView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, R.style.AppTheme);
+    }
+
+    public NarouWebView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
         final WebSettings settings = getSettings();
         settings.setJavaScriptEnabled(true);
     }
