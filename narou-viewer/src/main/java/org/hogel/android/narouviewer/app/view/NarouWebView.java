@@ -13,11 +13,11 @@ public class NarouWebView extends WebView {
     private int backKeyCount = 0;
 
     public NarouWebView(Context context) {
-        this(context, null, R.style.AppTheme);
+        this(context, null, android.R.attr.webViewStyle);
     }
 
     public NarouWebView(Context context, AttributeSet attrs) {
-        this(context, attrs, R.style.AppTheme);
+        this(context, attrs, android.R.attr.webViewStyle);
     }
 
     public NarouWebView(Context context, AttributeSet attrs, int defStyle) {
