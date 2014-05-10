@@ -62,12 +62,16 @@ public class BrowserActivity extends RoboActivity {
     }
 
     public void onPageStarted(WebView view, String url) {
-        reloadMenuItem.setVisible(false);
+        if (reloadMenuItem != null) {
+            reloadMenuItem.setVisible(false);
+        }
         setProgressBarIndeterminateVisibility(true);
     }
 
     public void onPageFinished(WebView view, String url) {
         setProgressBarIndeterminateVisibility(false);
-        reloadMenuItem.setVisible(true);
+        if (reloadMenuItem != null) {
+            reloadMenuItem.setVisible(true);
+        }
     }
 }
