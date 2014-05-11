@@ -1,24 +1,35 @@
 package org.hogel.android.narouviewer.app.activity;
 
-import android.app.ActionBar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
+import org.apache.http.Header;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.hogel.android.narouviewer.app.R;
 import org.hogel.android.narouviewer.app.view.NarouWebView;
 import org.hogel.android.narouviewer.app.webview.NarouWebViewClient;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
+import java.nio.charset.Charset;
+
 public class BrowserActivity extends RoboActivity {
     @InjectView(R.id.mainWebView)
     NarouWebView narouWebView;
 
     private MenuItem reloadMenuItem;
+    private NarouWebViewClient narouWebViewClient;
+
+    private AsyncHttpClient asyncHttpClient;
+    private PersistentCookieStore persistentCookieStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +41,13 @@ public class BrowserActivity extends RoboActivity {
 
         setContentView(R.layout.browser_view);
 
-        narouWebView.setWebViewClient(new NarouWebViewClient(this));
+        narouWebViewClient = new NarouWebViewClient(this);
+        narouWebView.setWebViewClient(narouWebViewClient);
+
+        asyncHttpClient = new AsyncHttpClient();
+        asyncHttpClient.setUserAgent(narouWebView.getSettings().getUserAgentString());
+        persistentCookieStore = new PersistentCookieStore(this);
+        asyncHttpClient.setCookieStore(persistentCookieStore);
 
         Uri data = getIntent().getData();
         narouWebView.loadUrl(data.toString());
@@ -48,16 +65,16 @@ public class BrowserActivity extends RoboActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_top:
-                narouWebView.goTop();
+                goTop();
                 return true;
             case R.id.action_user_home:
-                narouWebView.goUserHome();
+                goUserHome();
                 return true;
             case R.id.action_ranking:
-                narouWebView.goRanking();
+                goRanking();
                 return true;
             case R.id.action_reload:
-                narouWebView.reload();
+                reload();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -75,5 +92,46 @@ public class BrowserActivity extends RoboActivity {
         if (reloadMenuItem != null) {
             reloadMenuItem.setVisible(true);
         }
+
+        syncCookie();
+    }
+
+    private void goTop() {
+        narouWebView.loadUrl(getString(R.string.url_narou_top));
+    }
+
+    private void goUserHome() {
+        narouWebView.loadUrl(getString(R.string.url_narou_user_home));
+    }
+
+    private void goRanking() {
+        narouWebView.loadUrl(getString(R.string.url_narou_ranking));
+    }
+
+    private void reload() {
+        narouWebView.reload();
+    }
+
+    public void loadNcodeUrl(final String url) {
+        onPageStarted(narouWebView, url);
+
+        asyncHttpClient.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String data = new String(responseBody, Charset.forName("UTF-8"));
+                narouWebView.loadDataWithBaseURL(url, data, "text/html", "utf-8", null);
+            }
+        });
+    }
+
+    private void syncCookie() {
+        String webviewCookiesValues = CookieManager.getInstance().getCookie(getString(R.string.syostu_cookie_url));
+        for (String webviewCookieValue : webviewCookiesValues.split("; ")) {
+            String[] nameAndVal = webviewCookieValue.split("=");
+            BasicClientCookie cookie = new BasicClientCookie(nameAndVal[0], nameAndVal[1]);
+            cookie.setDomain(getString(R.string.syostu_cookie_url));
+            persistentCookieStore.addCookie(cookie);
+        }
+        asyncHttpClient.setCookieStore(persistentCookieStore);
     }
 }

@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 import org.hogel.android.narouviewer.app.R;
 
@@ -24,7 +25,7 @@ public class NarouWebView extends WebView {
         super(context, attrs, defStyle);
         final WebSettings settings = getSettings();
         settings.setJavaScriptEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
     }
 
     @Override
@@ -49,15 +50,4 @@ public class NarouWebView extends WebView {
         return super.onTouchEvent(event);
     }
 
-    public void goTop() {
-        loadUrl(getContext().getString(R.string.url_narou_top));
-    }
-
-    public void goUserHome() {
-        loadUrl(getContext().getString(R.string.url_narou_user_home));
-    }
-
-    public void goRanking() {
-        loadUrl(getContext().getString(R.string.url_narou_ranking));
-    }
 }
