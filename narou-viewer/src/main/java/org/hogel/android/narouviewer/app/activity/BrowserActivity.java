@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
+import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
@@ -15,6 +16,7 @@ import org.apache.http.Header;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.hogel.android.narouviewer.app.R;
 import org.hogel.android.narouviewer.app.view.NarouWebView;
+import org.hogel.android.narouviewer.app.webview.NarouUrl;
 import org.hogel.android.narouviewer.app.webview.NarouWebViewClient;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
@@ -109,7 +111,12 @@ public class BrowserActivity extends RoboActivity {
     }
 
     private void reload() {
-        narouWebView.reload();
+        NarouUrl currentNarouUrl = narouWebViewClient.getCurrentNarouUrl();
+        if (currentNarouUrl.isNcodeUrl()) {
+            loadNcodeUrl(currentNarouUrl.getUrl());
+        } else {
+            narouWebView.reload();
+        }
     }
 
     public void loadNcodeUrl(final String url) {
@@ -119,7 +126,7 @@ public class BrowserActivity extends RoboActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String data = new String(responseBody, Charset.forName("UTF-8"));
-                narouWebView.loadDataWithBaseURL(url, data, "text/html", "utf-8", null);
+                narouWebView.loadDataWithBaseURL(url, data, "text/html", "utf-8", url);
             }
         });
     }

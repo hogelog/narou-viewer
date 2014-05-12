@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.google.common.base.Optional;
 import org.hogel.android.narouviewer.app.R;
 import org.hogel.android.narouviewer.app.activity.BrowserActivity;
 import org.hogel.android.narouviewer.app.view.NarouWebView;
@@ -15,28 +16,25 @@ import java.util.regex.Pattern;
 public class NarouWebViewClient extends WebViewClient {
     private final BrowserActivity browserActivity;
     private final Context context;
+    private NarouUrl currentNarouUrl;
 
     public NarouWebViewClient(BrowserActivity activity) {
         browserActivity = activity;
         context = browserActivity.getApplicationContext();
     }
 
-    private static final Pattern NCODE_VIEW_PATH_PATTERN = Pattern.compile("^/\\w+/\\d+/$");
-
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        Uri uri = Uri.parse(url);
-        if (uri.getHost().endsWith(context.getString(R.string.narou_domain))) {
-            if (uri.getHost().equals("ncode.syosetu.com")) {
-                if (NCODE_VIEW_PATH_PATTERN.matcher(uri.getPath()).find()) {
-                    browserActivity.loadNcodeUrl(url);
-                    return true;
-                }
-            }
-            return false;
+        currentNarouUrl = NarouUrl.parse(url);
+        if (!currentNarouUrl.isNarouUrl()) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, currentNarouUrl.getUri()));
+            return true;
         }
-        context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        return true;
+        if (currentNarouUrl.isNcodeUrl()) {
+            browserActivity.loadNcodeUrl(url);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -49,5 +47,9 @@ public class NarouWebViewClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         browserActivity.onPageFinished(view, url);
+    }
+
+    public NarouUrl getCurrentNarouUrl() {
+        return currentNarouUrl;
     }
 }
