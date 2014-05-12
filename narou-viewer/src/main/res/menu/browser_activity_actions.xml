@@ -17,4 +17,7 @@
     <item android:id="@+id/action_ranking"
           android:title="@string/action_ranking"
           />
+    <item android:id="@+id/action_finish"
+          android:title="@string/action_finish"
+          />
 </menu>

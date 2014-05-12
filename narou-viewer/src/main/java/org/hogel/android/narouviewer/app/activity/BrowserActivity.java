@@ -86,6 +86,9 @@ public class BrowserActivity extends RoboActivity {
             case R.id.action_reload:
                 reload();
                 return true;
+            case R.id.action_finish:
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

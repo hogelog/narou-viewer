@@ -15,4 +15,5 @@
     <string name="action_ranking">ランキング</string>
 
     <string name="syostu_cookie_url">.syosetu.com</string>
+    <string name="action_finish">終了</string>
 </resources>
