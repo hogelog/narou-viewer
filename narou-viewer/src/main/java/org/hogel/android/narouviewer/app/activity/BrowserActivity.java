@@ -35,7 +35,6 @@ public class BrowserActivity extends RoboActivity {
     @Inject
     private HtmlCacheStore htmlCacheStore;
 
-    private MenuItem reloadMenuItem;
     private NarouWebViewClient narouWebViewClient;
 
     private AsyncHttpClient asyncHttpClient;
@@ -67,7 +66,6 @@ public class BrowserActivity extends RoboActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.browser_activity_actions, menu);
-        reloadMenuItem = menu.findItem(R.id.action_reload);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -94,17 +92,11 @@ public class BrowserActivity extends RoboActivity {
     }
 
     public void onPageStarted(WebView view, String url) {
-        if (reloadMenuItem != null) {
-            reloadMenuItem.setVisible(false);
-        }
         setProgressBarIndeterminateVisibility(true);
     }
 
     public void onPageFinished(WebView view, String url) {
         setProgressBarIndeterminateVisibility(false);
-        if (reloadMenuItem != null) {
-            reloadMenuItem.setVisible(true);
-        }
 
         syncCookie();
     }
