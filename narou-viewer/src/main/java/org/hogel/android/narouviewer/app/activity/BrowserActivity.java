@@ -24,6 +24,9 @@ import roboguice.inject.InjectView;
 
 import javax.inject.Inject;
 import java.nio.charset.Charset;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BrowserActivity extends RoboActivity {
     @InjectView(R.id.mainWebView)
@@ -145,8 +148,29 @@ public class BrowserActivity extends RoboActivity {
                 String data = new String(responseBody, Charset.forName("UTF-8"));
                 narouWebView.loadDataWithBaseURL(url, data, "text/html", "utf-8", url);
                 htmlCacheStore.addCache(url, data);
+                prefetchNcodeHtml(data);
             }
         });
+    }
+
+    private static final Pattern PREFETCH_ANCHOR_PATTERN = Pattern.compile("<a rel=\"(?:prev|next)\" href=\"([^\"]+)\"");
+    private void prefetchNcodeHtml(String html) {
+        Matcher matcher = PREFETCH_ANCHOR_PATTERN.matcher(html);
+        while (matcher.find()) {
+            MatchResult matchResult = matcher.toMatchResult();
+            String href = matchResult.group(1);
+            final String url = "http://ncode.syosetu.com" + href;
+            if (htmlCacheStore.hasCache(url)) {
+                continue;
+            }
+            asyncHttpClient.get(url, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    String data = new String(responseBody, Charset.forName("UTF-8"));
+                    htmlCacheStore.addCache(url, data);
+                }
+            });
+        }
     }
 
     private void syncCookie() {

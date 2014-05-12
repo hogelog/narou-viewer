@@ -19,4 +19,8 @@ public class HtmlCacheStore {
     public Optional<String> findCache(String url) {
         return Optional.fromNullable(cache.getIfPresent(url));
     }
+
+    public boolean hasCache(String url) {
+        return cache.getIfPresent(url) != null;
+    }
 }
