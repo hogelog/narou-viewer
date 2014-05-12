@@ -8,24 +8,29 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
-import android.widget.Toast;
+import com.google.common.base.Optional;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 import org.apache.http.Header;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.hogel.android.narouviewer.app.R;
+import org.hogel.android.narouviewer.app.util.HtmlCacheStore;
 import org.hogel.android.narouviewer.app.view.NarouWebView;
 import org.hogel.android.narouviewer.app.webview.NarouUrl;
 import org.hogel.android.narouviewer.app.webview.NarouWebViewClient;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
+import javax.inject.Inject;
 import java.nio.charset.Charset;
 
 public class BrowserActivity extends RoboActivity {
     @InjectView(R.id.mainWebView)
     NarouWebView narouWebView;
+
+    @Inject
+    private HtmlCacheStore htmlCacheStore;
 
     private MenuItem reloadMenuItem;
     private NarouWebViewClient narouWebViewClient;
@@ -113,20 +118,33 @@ public class BrowserActivity extends RoboActivity {
     private void reload() {
         NarouUrl currentNarouUrl = narouWebViewClient.getCurrentNarouUrl();
         if (currentNarouUrl.isNcodeUrl()) {
-            loadNcodeUrl(currentNarouUrl.getUrl());
+            loadNcodeUrl(currentNarouUrl.getUrl(), true);
         } else {
             narouWebView.reload();
         }
     }
 
-    public void loadNcodeUrl(final String url) {
+    public void loadNcodeUrl(String url) {
+        loadNcodeUrl(url, false);
+    }
+
+    public void loadNcodeUrl(final String url, boolean isReload) {
         onPageStarted(narouWebView, url);
+
+        if (!isReload) {
+            Optional<String> cache = htmlCacheStore.findCache(url);
+            if (cache.isPresent()) {
+                narouWebView.loadDataWithBaseURL(url, cache.get(), "text/html", "utf-8", url);
+                return;
+            }
+        }
 
         asyncHttpClient.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String data = new String(responseBody, Charset.forName("UTF-8"));
                 narouWebView.loadDataWithBaseURL(url, data, "text/html", "utf-8", url);
+                htmlCacheStore.addCache(url, data);
             }
         });
     }
