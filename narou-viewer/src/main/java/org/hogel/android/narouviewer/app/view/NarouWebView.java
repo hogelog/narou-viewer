@@ -6,10 +6,8 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 import org.hogel.android.narouviewer.app.R;
-import org.hogel.android.narouviewer.app.activity.BrowserActivity;
 
 public class NarouWebView extends WebView {
 

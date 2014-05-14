@@ -1,5 +1,7 @@
 package org.hogel.android.narouviewer.app.activity;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +10,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import com.google.common.base.Optional;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -18,7 +21,6 @@ import org.hogel.android.narouviewer.app.R;
 import org.hogel.android.narouviewer.app.util.HtmlCacheStore;
 import org.hogel.android.narouviewer.app.view.NarouWebView;
 import org.hogel.android.narouviewer.app.webview.NarouUrl;
-import org.hogel.android.narouviewer.app.webview.NarouWebViewClient;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
@@ -29,16 +31,44 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BrowserActivity extends RoboActivity {
+    class NarouViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            currentNarouUrl = NarouUrl.parse(url);
+            if (!currentNarouUrl.isNarouUrl()) {
+                startActivity(new Intent(Intent.ACTION_VIEW, currentNarouUrl.getUri()));
+                return true;
+            }
+            if (currentNarouUrl.isNcodeUrl()) {
+                loadNcodeUrl(url);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            setProgressBarIndeterminateVisibility(true);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            setProgressBarIndeterminateVisibility(false);
+
+            syncCookie();
+        }
+    }
+
     @InjectView(R.id.mainWebView)
     NarouWebView narouWebView;
 
     @Inject
     private HtmlCacheStore htmlCacheStore;
 
-    private NarouWebViewClient narouWebViewClient;
-
     private AsyncHttpClient asyncHttpClient;
     private PersistentCookieStore persistentCookieStore;
+
+    private NarouUrl currentNarouUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +80,7 @@ public class BrowserActivity extends RoboActivity {
 
         setContentView(R.layout.browser_view);
 
-        narouWebViewClient = new NarouWebViewClient(this);
-        narouWebView.setWebViewClient(narouWebViewClient);
+        narouWebView.setWebViewClient(new NarouViewClient());
 
         asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.setUserAgent(narouWebView.getSettings().getUserAgentString());
@@ -91,16 +120,6 @@ public class BrowserActivity extends RoboActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onPageStarted(WebView view, String url) {
-        setProgressBarIndeterminateVisibility(true);
-    }
-
-    public void onPageFinished(WebView view, String url) {
-        setProgressBarIndeterminateVisibility(false);
-
-        syncCookie();
-    }
-
     private void goTop() {
         narouWebView.loadUrl(getString(R.string.url_narou_top));
     }
@@ -114,7 +133,6 @@ public class BrowserActivity extends RoboActivity {
     }
 
     private void reload() {
-        NarouUrl currentNarouUrl = narouWebViewClient.getCurrentNarouUrl();
         if (currentNarouUrl.isNcodeUrl()) {
             loadNcodeUrl(currentNarouUrl.getUrl(), true);
         } else {
@@ -127,7 +145,7 @@ public class BrowserActivity extends RoboActivity {
     }
 
     public void loadNcodeUrl(final String url, boolean isReload) {
-        onPageStarted(narouWebView, url);
+        setProgressBarIndeterminateVisibility(true);
 
         if (!isReload) {
             Optional<String> cache = htmlCacheStore.findCache(url);
